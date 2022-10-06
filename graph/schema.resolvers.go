@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ekszuki/graphhql-server/graph/generated"
 	"github.com/ekszuki/graphhql-server/graph/model"
@@ -13,12 +12,22 @@ import (
 
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
-	panic(fmt.Errorf("not implemented: CreateVideo - createVideo"))
+	model, err := r.VideoRepo.Create(ctx, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	return model, nil
 }
 
 // Videos is the resolver for the videos field.
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
-	panic(fmt.Errorf("not implemented: Videos - videos"))
+	videos, err := r.VideoRepo.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return videos, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

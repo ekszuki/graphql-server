@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ekszuki/graphhql-server/graph/model"
@@ -31,28 +30,20 @@ func (r *videosRepo) Create(
 		Title: video.Title,
 		URL:   video.URL,
 		Author: &model.User{
-			ID: video.UserID,
+			ID:   video.UserID,
+			Name: video.Name,
 		},
 	}
 
 	ctxTimeout, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	res, err := r.collection.InsertOne(ctxTimeout, mVideo)
+	_, err := r.collection.InsertOne(ctxTimeout, mVideo)
 	if err != nil {
 		return nil, err
 	}
 
-	newVideo := model.Video{
-		ID:    fmt.Sprintf("%s", res.InsertedID),
-		Title: video.Title,
-		URL:   video.URL,
-		Author: &model.User{
-			ID: video.UserID,
-		},
-	}
-
-	return &newVideo, nil
+	return &mVideo, nil
 }
 
 func (r *videosRepo) FindAll(ctx context.Context) ([]*model.Video, error) {
