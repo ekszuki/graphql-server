@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mongo:
+    container_name: graphql-mongo
+    image: mongo
+    restart: always
+    hostname: mongo
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: mongopass
+    ports:
+        - "27017:27017"
+    networks:
+      mcommunication-network:
+        ipv4_address: 172.50.23.5
+
+  app:
+    container_name: vscode
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # [Choice] Go version 1, 1.18, 1.17
+        # Append -bullseye or -buster to pin to an OS version.
+        # Use -bullseye variants on local arm64/Apple Silicon.
+        VARIANT: "1.19-buster"
+        # Options
+        NODE_VERSION: "none"
+
+    env_file:
+      # Ensure that the variables in .env match the same variables in devcontainer.json
+      - .env
+
+    # Security Opt and cap_add allow for C++ based debuggers to work.
+    # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
+    #     security_opt:
+    #       - seccomp:unconfined
+    #     cap_add:
+    #       - SYS_PTRACE
+
+    volumes:
+      - ..:/workspace:cached
+      # - /home/ekszuki/Projects/90Poe/configs:/configs
+
+    networks:
+        mcommunication-network:
+          ipv4_address: 172.50.23.3
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+
+networks:
+    mcommunication-network:
+        name: mcommunication-network
+        driver: bridge
+        ipam:
+          config:
+            - subnet: 172.50.23.0/24
+
