@@ -9,4 +9,5 @@ import (
 type Repository interface {
 	Create(ctx context.Context, video *model.NewVideo) (*model.Video, error)
 	FindAll(ctx context.Context) ([]*model.Video, error)
+	Delete(ctx context.Context, id string) error
 }

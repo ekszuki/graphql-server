@@ -23,6 +23,8 @@ input NewVideo {
   Name: String!
 }
 
+
 type Mutation{
   createVideo(input:NewVideo!): Video!
+  deleteVideo(id: String!): Video
 }

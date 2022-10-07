@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/ekszuki/graphhql-server/graph/model"
@@ -14,6 +15,23 @@ import (
 
 type videosRepo struct {
 	collection *mongo.Collection
+}
+
+// Delete implements videos.Repository
+func (r *videosRepo) Delete(ctx context.Context, id string) error {
+	ctxTimeout, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	status, err := r.collection.DeleteOne(ctxTimeout, bson.M{"id": id})
+	if err != nil {
+		return err
+	}
+
+	if status.DeletedCount == 0 {
+		return fmt.Errorf("document not found")
+	}
+
+	return nil
 }
 
 func NewVideoRepo(collection *mongo.Collection) videos.Repository {

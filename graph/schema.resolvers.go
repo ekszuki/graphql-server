@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ekszuki/graphhql-server/graph/generated"
 	"github.com/ekszuki/graphhql-server/graph/model"
@@ -18,6 +19,20 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo
 	}
 
 	return model, nil
+}
+
+// DeleteVideo is the resolver for the deleteVideo field.
+func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.Video, error) {
+	if id == "" {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	err := r.VideoRepo.Delete(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("cannot delete document %s: %v", id, err)
+	}
+
+	return nil, nil
 }
 
 // Videos is the resolver for the videos field.
